@@ -9,14 +9,14 @@ interface AdminPageProps {
   faqs: FAQ[];
   onAdd: (faq: Omit<FAQ, 'id' | 'views' | 'helpful' | 'notHelpful' | 'createdAt' | 'updatedAt'>) => void;
   onUpdate: (faq: FAQ) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ faqs, onAdd, onUpdate, onDelete }) => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [editingFaq, setEditingFaq] = useState<FAQ | null>(null);
-  const [deletingFaqId, setDeletingFaqId] = useState<number | null>(null);
+  const [deletingFaqId, setDeletingFaqId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
 
@@ -30,7 +30,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ faqs, onAdd, onUpdate, onDelete }
     setIsFormModalOpen(true);
   };
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = (id: string) => {
     setDeletingFaqId(id);
     setIsConfirmModalOpen(true);
   };
@@ -49,7 +49,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ faqs, onAdd, onUpdate, onDelete }
       const matchesSearch = searchTerm.trim() === '' || 
         faq.question.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesSearch;
-    }).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    });
   }, [faqs, searchTerm, filterCategory]);
 
   return (

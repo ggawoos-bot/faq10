@@ -1,117 +1,101 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { collection, query, onSnapshot, addDoc, updateDoc, doc, deleteDoc, serverTimestamp, increment, orderBy, Timestamp } from 'firebase/firestore';
+import { db } from './firebase';
 import { FAQ, Category, Page } from './types';
 import Header from './components/Header';
 import UserPage from './pages/UserPage';
 import AdminPage from './pages/AdminPage';
 
-const initialFaqs: FAQ[] = [
-  {
-    id: 1,
-    question: "결제는 어떻게 하나요?",
-    answer: "결제는 신용카드, 무통장 입금, 그리고 다양한 간편 결제 서비스를 통해 가능합니다. 결제 페이지에서 원하시는 방법을 선택해주세요.",
-    category: Category.PAYMENT,
-    views: 152,
-    helpful: 120,
-    notHelpful: 5,
-    createdAt: "2023-10-26",
-    updatedAt: "2023-10-27"
-  },
-  {
-    id: 2,
-    question: "배송 조회는 어디서 할 수 있나요?",
-    answer: "주문 완료 후 발송된 이메일의 '배송 추적' 링크를 클릭하시거나, 마이페이지의 '주문 내역'에서 실시간 배송 정보를 확인하실 수 있습니다.",
-    category: Category.SHIPPING,
-    views: 230,
-    helpful: 198,
-    notHelpful: 12,
-    createdAt: "2023-10-25",
-    updatedAt: "2023-10-25"
-  },
-  {
-    id: 3,
-    question: "회원가입은 어떻게 하나요?",
-    answer: "홈페이지 우측 상단의 '회원가입' 버튼을 클릭하여 이메일 인증 및 정보 입력을 통해 가입하실 수 있습니다.",
-    category: Category.ACCOUNT,
-    views: 88,
-    helpful: 70,
-    notHelpful: 2,
-    createdAt: "2023-10-24",
-    updatedAt: "2023-10-24"
-  },
-  {
-    id: 4,
-    question: "해외 배송도 가능한가요?",
-    answer: "네, 일부 국가에 한해 해외 배송 서비스를 제공하고 있습니다. 배송 가능 국가는 고객센터를 통해 문의해주시기 바랍니다.",
-    category: Category.SHIPPING,
-    views: 115,
-    helpful: 95,
-    notHelpful: 3,
-    createdAt: "2023-10-23",
-    updatedAt: "2023-10-26"
-  },
-   {
-    id: 5,
-    question: "포인트는 어떻게 사용하나요?",
-    answer: "결제 시 '포인트 사용'란에 사용하고자 하는 금액을 입력하시면 총 결제 금액에서 차감됩니다. 최소 1,000점부터 사용 가능합니다.",
-    category: Category.PAYMENT,
-    views: 180,
-    helpful: 150,
-    notHelpful: 10,
-    createdAt: "2023-11-01",
-    updatedAt: "2023-11-02"
-  },
-  {
-    id: 6,
-    question: "비밀번호를 잊어버렸어요.",
-    answer: "로그인 페이지 하단의 '비밀번호 찾기'를 통해 가입 시 등록한 이메일로 임시 비밀번호를 발급받을 수 있습니다.",
-    category: Category.ACCOUNT,
-    views: 301,
-    helpful: 250,
-    notHelpful: 21,
-    createdAt: "2023-10-30",
-    updatedAt: "2023-10-30"
-  },
-];
-
 const App: React.FC = () => {
-  const [faqs, setFaqs] = useState<FAQ[]>(initialFaqs);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [currentPage, setCurrentPage] = useState<Page>('user');
 
-  const addFaq = useCallback((faq: Omit<FAQ, 'id' | 'views' | 'helpful' | 'notHelpful' | 'createdAt' | 'updatedAt'>) => {
-    setFaqs(prev => {
-      const newFaq: FAQ = {
+  useEffect(() => {
+    const q = query(collection(db, "faqs"), orderBy("updatedAt", "desc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const faqsData = querySnapshot.docs.map(docSnapshot => {
+            const data = docSnapshot.data();
+            const formatTimestamp = (timestamp: Timestamp) => {
+                return timestamp ? timestamp.toDate().toISOString().split('T')[0] : '';
+            }
+            return {
+                id: docSnapshot.id,
+                question: data.question,
+                answer: data.answer,
+                category: data.category,
+                views: data.views,
+                helpful: data.helpful,
+                notHelpful: data.notHelpful,
+                createdAt: formatTimestamp(data.createdAt),
+                updatedAt: formatTimestamp(data.updatedAt),
+            } as FAQ;
+        });
+        setFaqs(faqsData);
+    }, (error) => {
+        console.error("Error fetching FAQs: ", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const addFaq = useCallback(async (faq: Omit<FAQ, 'id' | 'views' | 'helpful' | 'notHelpful' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      await addDoc(collection(db, 'faqs'), {
         ...faq,
-        id: Date.now(),
         views: 0,
         helpful: 0,
         notHelpful: 0,
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0],
-      };
-      return [newFaq, ...prev];
-    });
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
   }, []);
 
-  const updateFaq = useCallback((updatedFaq: FAQ) => {
-    setFaqs(prev => prev.map(faq => (faq.id === updatedFaq.id ? { ...updatedFaq, updatedAt: new Date().toISOString().split('T')[0] } : faq)));
+  const updateFaq = useCallback(async (updatedFaq: FAQ) => {
+    const faqRef = doc(db, 'faqs', updatedFaq.id);
+    try {
+      await updateDoc(faqRef, {
+        question: updatedFaq.question,
+        answer: updatedFaq.answer,
+        category: updatedFaq.category,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    }
   }, []);
 
-  const deleteFaq = useCallback((id: number) => {
-    setFaqs(prev => prev.filter(faq => faq.id !== id));
+  const deleteFaq = useCallback(async (id: string) => {
+    try {
+        await deleteDoc(doc(db, 'faqs', id));
+    } catch (error) {
+        console.error("Error deleting document: ", error);
+    }
   }, []);
   
-  const incrementViewCount = useCallback((id: number) => {
-    setFaqs(prev => prev.map(faq => faq.id === id ? { ...faq, views: faq.views + 1 } : faq));
+  const incrementViewCount = useCallback(async (id: string) => {
+    const faqRef = doc(db, 'faqs', id);
+    try {
+        await updateDoc(faqRef, {
+            views: increment(1)
+        });
+    } catch (error) {
+        console.error("Error updating view count: ", error);
+    }
   }, []);
 
-  const handleFeedback = useCallback((id: number, type: 'helpful' | 'notHelpful') => {
-    setFaqs(prev => prev.map(faq => {
-      if (faq.id === id) {
-        return { ...faq, [type]: faq[type] + 1 };
-      }
-      return faq;
-    }));
+  const handleFeedback = useCallback(async (id: string, type: 'helpful' | 'notHelpful') => {
+    const faqRef = doc(db, 'faqs', id);
+    try {
+        await updateDoc(faqRef, {
+            [type]: increment(1)
+        });
+    } catch (error) {
+        console.error("Error handling feedback: ", error);
+    }
   }, []);
 
   return (

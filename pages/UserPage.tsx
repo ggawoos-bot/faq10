@@ -7,7 +7,7 @@ interface AccordionItemProps {
   faq: FAQ;
   isOpen: boolean;
   onToggle: () => void;
-  onFeedback: (id: number, type: 'helpful' | 'notHelpful') => void;
+  onFeedback: (id: string, type: 'helpful' | 'notHelpful') => void;
 }
 
 const AccordionItem: React.FC<AccordionItemProps> = ({ faq, isOpen, onToggle, onFeedback }) => {
@@ -66,14 +66,14 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ faq, isOpen, onToggle, on
 
 interface UserPageProps {
   faqs: FAQ[];
-  onIncrementView: (id: number) => void;
-  onFeedback: (id: number, type: 'helpful' | 'notHelpful') => void;
+  onIncrementView: (id: string) => void;
+  onFeedback: (id: string, type: 'helpful' | 'notHelpful') => void;
 }
 
 const UserPage: React.FC<UserPageProps> = ({ faqs, onIncrementView, onFeedback }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
-  const [openId, setOpenId] = useState<number | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
   
   const categories: ('all' | Category)[] = ['all', ...Object.values(Category)];
 
@@ -87,7 +87,7 @@ const UserPage: React.FC<UserPageProps> = ({ faqs, onIncrementView, onFeedback }
     });
   }, [faqs, searchTerm, selectedCategory]);
 
-  const handleToggle = (id: number) => {
+  const handleToggle = (id: string) => {
     if (openId !== id) {
         onIncrementView(id);
         setOpenId(id);
