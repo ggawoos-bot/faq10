@@ -1,4 +1,4 @@
-// Fix: Import initializeApp directly from "firebase/app" for Firebase v9+ SDK.
+// FIX: Use Firebase v9 syntax.
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
@@ -25,7 +25,7 @@ import { getFirestore } from "firebase/firestore";
 
 
 // Initialize Firebase
-// Fix: Call the imported initializeApp function directly.
+// FIX: Use Firebase v9 initialization syntax.
 const app = initializeApp(firebaseConfig);
-// Fix: Removed extraneous text from the end of this file that was causing a syntax error.
+// FIX: Use Firebase v9 firestore export.
 export const db = getFirestore(app);
