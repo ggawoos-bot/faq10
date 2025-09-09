@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
             className={`flex items-center space-x-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 ${currentPage === 'admin' ? activeClass : inactiveClass}`}
           >
             <CogIcon className="w-5 h-5" />
-            <span>관리자</span>
+            <span></span>
           </button>
         </div>
       </div>
