@@ -13,7 +13,7 @@ interface FaqFormModalProps {
 const FaqFormModal: React.FC<FaqFormModalProps> = ({ isOpen, onClose, onSave, faq }) => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const [category, setCategory] = useState<Category>(Category.PAYMENT);
+  const [category, setCategory] = useState<Category>(Category.GENERAL);
 
   useEffect(() => {
     if (faq) {
@@ -23,7 +23,7 @@ const FaqFormModal: React.FC<FaqFormModalProps> = ({ isOpen, onClose, onSave, fa
     } else {
       setQuestion('');
       setAnswer('');
-      setCategory(Category.PAYMENT);
+      setCategory(Category.GENERAL);
     }
   }, [faq, isOpen]);
 

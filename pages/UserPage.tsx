@@ -99,7 +99,6 @@ const UserPage: React.FC<UserPageProps> = ({ faqs, onIncrementView, onFeedback }
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
-        <h2 className="text-2xl font-bold mb-4 text-center">무엇을 도와드릴까요?</h2>
         <div className="relative">
           <input
             type="text"
