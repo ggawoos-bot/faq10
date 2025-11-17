@@ -59,20 +59,20 @@ const AdminPage: React.FC<AdminPageProps> = ({ faqs, onAdd, onUpdate, onDelete }
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+      <div className="flex flex-col justify-between items-start mb-6 gap-4">
         <h2 className="text-2xl font-bold text-gray-800">FAQ 관리</h2>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <div className="flex flex-row gap-2 w-full">
           <button
             onClick={handleExportToExcel}
             disabled={filteredFaqs.length === 0}
-            className="w-full sm:w-auto flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed min-w-[140px]"
           >
             <DocumentDownloadIcon className="w-5 h-5 mr-2" />
             Excel 내보내기 ({filteredFaqs.length}개)
           </button>
           <button
             onClick={handleAddNew}
-            className="w-full sm:w-auto flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="flex-1 flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors min-w-[140px]"
           >
             <PlusIcon className="w-5 h-5 mr-2" />
             새 FAQ 등록
